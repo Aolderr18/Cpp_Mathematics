@@ -19,6 +19,7 @@ class BigNumber {
         string integerDigits, decimalDigits;
     public:
         BigNumber();
+        BigNumber(string); // Only integer digits are provided.
         BigNumber(string, string);
         BigNumber(bool, string, string);
         string userVisibleRepresentation();
