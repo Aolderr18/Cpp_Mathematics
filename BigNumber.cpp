@@ -8,11 +8,18 @@ BigNumber::BigNumber()
      * A default constructor is essential for 
      * implementations of BigNumber.
      */
+     setNonNegative(true); // By default, a number should be nonnegative.
+}
+
+BigNumber::BigNumber(string integerDigits)
+{
+	setNonNegative(true);
+	setIntegerDigits(integerDigits);
 }
 
 BigNumber::BigNumber(string integerDigits, string decimalDigits)
 {
-    setNonNegative(true); // By default, a number should be nonnegative.
+    setNonNegative(true); 
     setIntegerDigits(integerDigits);
     setDecimalDigits(decimalDigits);
 }
@@ -28,13 +35,15 @@ string BigNumber::userVisibleRepresentation()
 {
     if (nonNegative)
     {
-        if (decimalDigits.length() > 0)
+        if (decimalDigits.length())
             return integerDigits + "." + decimalDigits;
-        return integerDigits;
+        return integerDigits; // If a number contains no decimal digits, it should be represented as an integer.
     }
-    if (decimalDigits.length() > 0)
+    if (decimalDigits.length())
         return "-" + integerDigits + "." + decimalDigits;
-    return "-" + integerDigits;
+    if (integerDigits.lenght())
+    	return "-" + integerDigits;
+    return "0"; // A number with no digits should be treated as a zero.
 }
 
 BigNumber BigNumber::sum(BigNumber other)
