@@ -33,6 +33,7 @@ BigNumber::BigNumber(bool nonNegative, string integerDigits, string decimalDigit
 
 string BigNumber::userVisibleRepresentation()
 {
+    trimZeros();
     if (nonNegative)
     {
         if (decimalDigits.length())
