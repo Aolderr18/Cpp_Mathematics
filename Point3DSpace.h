@@ -6,7 +6,7 @@
 
 #ifndef POINT3DSPACE_H
 #define POINT3DSPACE_H
-#include "BigNumber.h"
+#include "AccurateNumber.h"
 
 class Point3DSpace {
 private:
