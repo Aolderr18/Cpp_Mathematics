@@ -10,18 +10,18 @@
 
 class Point3DSpace {
 private:
-    BigNumber X_Coordinate;
-    BigNumber Y_Coordinate;
-    BigNumber Z_Coordinate;
+    AccurateNumber X_Coordinate;
+    AccurateNumber Y_Coordinate;
+    AccurateNumber Z_Coordinate;
 public:
     Point3DSpace(); // Default point at the origin
-    Point3DSpace(BigNumber, BigNumber, BigNumber);
-    BigNumber getX_Coordinate();
-    BigNumber getY_Coordinate();
-    BigNumber getZ_Coordinate();
-    void setX_Coordinate(BigNumber);
-    void setY_Coordinate(BigNumber);
-    void setZ_Coordinate(BigNumber);
+    Point3DSpace(AccurateNumber, AccurateNumber, AccurateNumber);
+    AccurateNumber getX_Coordinate(void);
+    AccurateNumber getY_Coordinate(void);
+    AccurateNumber getZ_Coordinate(void);
+    void setX_Coordinate(AccurateNumber);
+    void setY_Coordinate(AccurateNumber);
+    void setZ_Coordinate(AccurateNumber);
 };
 
 #endif
