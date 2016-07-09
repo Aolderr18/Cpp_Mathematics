@@ -9,7 +9,7 @@ private:
 public:
     LineSegment3DSpace(void);
     LineSegment3DSpace(Point3DSpace, Point3DSpace);
-    BigNumber segmentLength(void);
+    AccurateNumber segmentLength(void);
     Point3DSpace getStart(void);
     Point3DSpace getEnd(void);
     void setStart(Point3DSpace);
