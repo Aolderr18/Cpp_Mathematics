@@ -142,13 +142,14 @@ AccurateNumber AccurateNumber::difference(AccurateNumber other)
     AccurateNumber duplicate(nonNegative, integerDigits, decimalDigits);
     if (nonNegative xor other.isNonNegative())
     {
-        if (hasGreaterAbsoluteValueThan(other))
-        {
-            other.setNonNegative(nonNegative);
-            return sum(other);
-        }
-        duplicate.setNonNegative(other.isNonNegative());
-        return other.sum(duplicate);
+        other.setNonNegative(nonNegative);
+        return sum(other);
+    }
+    if (hasLowerAbsoluteValueThan(other))
+    {
+        other.setNonNegative(not other.isNonNegative());
+        setNonNegative(not nonNegative);
+        return other.difference(duplicate);
     }
     stringstream operand1, operand2;
     unsigned differenceInLength = 0;
@@ -432,15 +433,14 @@ AccurateNumber AccurateNumber::modulus(AccurateNumber other)
 
 AccurateNumber AccurateNumber::power(int x)
 {
-    AccurateNumber one("1", ""), duplicate(nonNegative, integerDigits, decimalDigits);
+    AccurateNumber one("1"), duplicate(nonNegative, integerDigits, decimalDigits);
     if (x < 0)
         return one.quotient(power(-x));
     if (x == 0)
         return one; // Any number raised to the zero power is 1.
     if (x == 1)
         return duplicate; // Any number raised to the first power is itself.
-    AccurateNumber Power("1", "");
-    Power.setNonNegative(true);
+    AccurateNumber Power("1");
     unsigned times = 0;
     while (x - ++times + 1)
         Power = Power.product(duplicate);
@@ -553,6 +553,31 @@ void AccurateNumber::operator%=(AccurateNumber other) throw(std::exception)
     setIntegerDigits(modulus.getIntegerDigits());
     setDecimalDigits(modulus.getDecimalDigits());
     setNonNegative(modulus.isNonNegative());
+}
+
+bool AccurateNumber::operator<(AccurateNumber other) throw(std::exception)
+{
+    return isLessThan(other);
+}
+
+bool AccurateNumber::operator==(AccurateNumber other) throw(std::exception)
+{
+    return isEqualTo(other);
+}
+
+bool AccurateNumber::operator>(AccurateNumber other) throw(std::exception)
+{
+    return isGreaterThan(other);
+}
+
+bool AccurateNumber::operator<=(AccurateNumber other) throw(std::exception)
+{
+    return isLessThanOrEqualTo(other);
+}
+
+bool AccurateNumber::operator>=(AccurateNumber other) throw(std::exception)
+{
+    return isGreaterThanOrEqualTo(other);
 }
 
 void AccurateNumber::trimZeros()
