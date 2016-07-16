@@ -364,71 +364,80 @@ AccurateNumber AccurateNumber::product(AccurateNumber other)
 
 AccurateNumber AccurateNumber::quotient(AccurateNumber other)
 {
-    AccurateNumber Quotient;
-    if (nonNegative xor other.isNonNegative())/*
-                                               * A negative divided by a positive
-                                               * or a positive divided by a negative
-                                               * returns a negative.
-                                               */
-        Quotient.setNonNegative(false);
-    else
-        Quotient.setNonNegative(true);
-    AccurateNumber increment("1", "");
-    Quotient.setIntegerDigits("1");
-    unsigned precisionDestination = 129, precisionFactor = 0;
-    while (precisionDestination - precisionFactor)
+    AccurateNumber Quotient, Divisor(other.getIntegerDigits(), other.getDecimalDigits());
+    string dividendDigits = integerDigits + decimalDigits;
+    string divisorDigits = Divisor.getIntegerDigits() + Divisor.getDecimalDigits();
+    stringstream quotientDigits;
+    unsigned digitsBeforeDecimal = integerDigits.length() - other.getIntegerDigits().length();
+    if (dividendDigits.at(0) >= divisorDigits.at(0))
+        ++digitsBeforeDecimal;
+    unsigned placeIndex = 0;
+    AccurateNumber temporaryDividend(dividendDigits.substr(placeIndex++, 1));
+    unsigned precisionFactor = 0, precisionDestination = 129;
+    while (precisionDestination - precisionFactor++)
     {
-        bool decrementNecessary = true;
-        AccurateNumber temp = Quotient.product(other);
-        while (isGreaterThanOrEqualTo(temp))
+        while (Divisor > temporaryDividend)
         {
-            if (Quotient.getDecimalDigits().length() > 1)
-                if (Quotient.getDecimalDigits().substr(Quotient.getDecimalDigits().length() - 2, 2) == "99")
-                {
-                    decrementNecessary = false;
-		    Quotient.setDecimalDigits(Quotient.getDecimalDigits() + "0");
-		    break;
-                }
-            Quotient = Quotient.sum(increment);
+            if (placeIndex < dividendDigits.length())
+                temporaryDividend.setIntegerDigits(temporaryDividend.getIntegerDigits() + dividendDigits.substr(placeIndex++, 1));
+            else
+            {
+                if (temporaryDividend == Divisor - Divisor)
+                    break;
+                temporaryDividend.setIntegerDigits(temporaryDividend.getIntegerDigits() + "0");
+            }
+            if (Divisor > temporaryDividend)
+                quotientDigits << "0";
         }
-        if (decrementNecessary)
-            Quotient = Quotient.difference(increment);
-        decrementNecessary = true;
-        if (precisionFactor == 0)
+        AccurateNumber temporaryFactor("1"), increment("1"), temporaryProduct = Divisor * temporaryFactor;
+        while (temporaryProduct <= temporaryDividend)
         {
-            increment.setIntegerDigits("0");
-            increment.setDecimalDigits("1");
+            temporaryFactor += increment;
+            temporaryProduct = Divisor * temporaryFactor;
         }
-        else
-            increment.setDecimalDigits("0" + increment.getDecimalDigits());
-        precisionFactor++;
+        temporaryFactor -= increment;
+        quotientDigits << temporaryFactor.userVisibleRepresentation();
+        temporaryProduct = Divisor * temporaryFactor;
+        temporaryDividend -= temporaryProduct;
     }
-    Quotient.trimZeros();
+    placeIndex -= placeIndex;
+    stringstream quotientIntegerDigits, quotientDecimalDigits;
+    while (quotientDigits.str().length() - placeIndex++)
+    {
+        if (placeIndex - 1 < digitsBeforeDecimal)
+        {
+            quotientIntegerDigits << quotientDigits.str().substr(placeIndex - 1, 1);
+            continue;
+        }
+        quotientDecimalDigits << quotientDigits.str().substr(placeIndex - 1, 1);
+    }
+    Quotient.setIntegerDigits(quotientIntegerDigits.str());
+    Quotient.setDecimalDigits(quotientDecimalDigits.str());
+    if (nonNegative xor other.isNonNegative())
+        Quotient.setNonNegative(false);
     return Quotient;
 }
 
 AccurateNumber AccurateNumber::modulus(AccurateNumber other)
 {
-    AccurateNumber increment("1"), test("0"), comparator;
-    comparator = test.product(other);
-    while (isGreaterThanOrEqualTo(comparator))
+    AccurateNumber Quotient = quotient(other);
+    AccurateNumber Modulus, temporary;
+    temporary.setDecimalDigits(Quotient.getDecimalDigits());
+    bool negative;
+    if (not other.isNonNegative())
+        negative = true;
+    if (nonNegative xor other.isNonNegative())
     {
-        test = test.sum(increment);
-        comparator = test.product(other);
-    }
-    AccurateNumber modulus;
-    if (other.isNonNegative() xor isNonNegative())
-    {
-        modulus.setNonNegative(other.isNonNegative());
+        other.setNonNegative(true);
+        Modulus = other - (other * temporary);
     }
     else
     {
-        modulus.setNonNegative(isNonNegative());
-        test = test.difference(increment);
-        comparator = test.product(other);
+        other.setNonNegative(true);
+        Modulus = other * temporary;
     }
-    modulus = modulus.difference(comparator);
-    return modulus;
+    Modulus.setNonNegative(not negative);
+    return Modulus;
 }
 
 AccurateNumber AccurateNumber::power(int x)
